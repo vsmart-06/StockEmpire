@@ -106,12 +106,18 @@ def remove_ticker(id: int, company: str):
                 except ValueError:
                     break
             try:
-                count = all_tickers.index(company)+1
+                count = all_tickers.index(company)
+                all_tickers.pop(count)
             except ValueError:
                 c.close()
                 conn.close()
                 return 1
-            c.execute(f"UPDATE user_portfolios SET ticker_{count} = NULL WHERE user_id = {id}")
+            for x in range(5):
+                try:
+                    obj = '"'+all_tickers[x]+'"'
+                except IndexError:
+                    obj = "NULL"
+                c.execute(f"UPDATE user_portfolios SET ticker_{x+1} = {obj} WHERE user_id = {id}")
             conn.commit()
             c.close()
             conn.close()

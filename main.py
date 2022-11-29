@@ -42,7 +42,7 @@ async def portfolio_view(interaction: discord.Interaction):
     user_portfolio = get_portfolio(interaction.user.id)
     if user_portfolio:
         for x in range(len(user_portfolio)):
-            company = user_portfolio[x]
+            company: str = user_portfolio[x]
             stock_data = stocks(str(interaction.user), company)
             shares_embed = discord.Embed(title = f"Summary of {stock_data['name']}'s shares {stock_data['duration']}", colour = discord.Colour.blue())
             for field in list(stock_data.keys())[2:]:
