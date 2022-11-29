@@ -21,11 +21,11 @@ c = conn.cursor()
 try:
     c.execute('''CREATE TABLE user_portfolios (
         user_id BIGINT NOT NULL PRIMARY KEY,
-        ticker_1 VARCHAR,
-        ticker_2 VARCHAR,
-        ticker_3 VARCHAR,
-        ticker_4 VARCHAR,
-        ticker_5 VARCHAR
+        ticker_1 VARCHAR(10),
+        ticker_2 VARCHAR(10),
+        ticker_3 VARCHAR(10),
+        ticker_4 VARCHAR(10),
+        ticker_5 VARCHAR(10)
         )''')
     conn.commit()
 
@@ -62,7 +62,12 @@ def add_ticker(id: int, company: str):
             return None
         except db.errors.IntegrityError:
             c.execute(f"SELECT * FROM user_portfolios WHERE user_id = {id}")
-            all_tickers = c.fetchone()
+            all_tickers = list(c.fetchone()[1:])
+            while True:
+                try:
+                    all_tickers.remove(None)
+                except ValueError:
+                    break
             if len(all_tickers) == 5:
                 c.close()
                 conn.close()
@@ -94,14 +99,19 @@ def remove_ticker(id: int, company: str):
     if isCompany(company):
         try:
             c.execute(f"SELECT * FROM user_portfolios WHERE user_id = {id}")
-            all_tickers: list = c.fetchone()
+            all_tickers = list(c.fetchone()[1:])
+            while True:
+                try:
+                    all_tickers.remove(None)
+                except ValueError:
+                    break
             try:
-                count = all_tickers.index(company)
+                count = all_tickers.index(company)+1
             except ValueError:
                 c.close()
                 conn.close()
                 return 1
-            c.execute(f"UPDATE user_portfolios SET ticker_{count} = {None} WHERE user_id = {id}")
+            c.execute(f"UPDATE user_portfolios SET ticker_{count} = NULL WHERE user_id = {id}")
             conn.commit()
             c.close()
             conn.close()
@@ -126,7 +136,12 @@ def get_portfolio(id: int):
 
     try:
         c.execute(f"SELECT * FROM user_portfolios WHERE user_id = {id}")
-        portfolio = c.fetchone()
+        portfolio = list(c.fetchone()[1:])
+        while True:
+            try:
+                portfolio.remove(None)
+            except ValueError:
+                break
         c.close()
         conn.close()
         return portfolio

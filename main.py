@@ -58,26 +58,26 @@ async def portfolio_view(interaction: discord.Interaction):
 @portfolio.subcommand(name = "add", description = "Add a ticker to your portfolio")
 async def portfolio_view(interaction: discord.Interaction, company: str = discord.SlashOption(name = "company", description = "The symbol of the company you would like to add to your portfolio", required = True)):
     result = add_ticker(interaction.user.id, company)
-    if not result:
-        await interaction.send("Ticker added!", ephemeral = True)
-    elif result == 0:
+    if result == 0:
         await interaction.send("Invalid company symbol", ephemeral = True)
     elif result == 1:
         await interaction.send("You can't add more than 5 companies to your portfolio!", ephemeral = True)
     elif result == 2:
         await interaction.send("This company is already in your portfolio!", ephemeral = True)
+    else:
+        await interaction.send("Ticker added!", ephemeral = True)
 
 
 @portfolio.subcommand(name = "remove", description = "Remove a ticker from your portfolio")
 async def portfolio_view(interaction: discord.Interaction, company: str = discord.SlashOption(name = "company", description = "The symbol of the company you would like to remove from your portfolio", required = True)):
     result = remove_ticker(interaction.user.id, company)
-    if not result:
-        await interaction.send("Ticker removed!", ephemeral = True)
-    elif result == 0:
+    if result == 0:
         await interaction.send("Invalid company symbol", ephemeral = True)
     elif result == 1:
         await interaction.send("This company is not there in your portfolio!", ephemeral = True)
     elif result == 2:
         await interaction.send("You have not created a portfolio yet!", ephemeral = True)
+    else:
+        await interaction.send("Ticker removed!", ephemeral = True)
 
 bot.run(token)
