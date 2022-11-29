@@ -7,35 +7,35 @@ def stocks(username: str, company: str, duration: str = "1 day"):
     if duration == "1 day":
         duration = "1d"
         interval = "2m"
-        sfactor = 2
+        sfactor = 2/247.58
     elif duration == "5 days":
         duration = "5d"
         interval = "15m"
-        sfactor = 7
+        sfactor = 7/247.58
     elif duration == "1 month":
         duration = "1mo"
         interval = "90m"
-        sfactor = 25
+        sfactor = 25/247.58
     elif duration == "6 months":
         duration = "6mo"
         interval = "1d"
-        sfactor = 60
+        sfactor = 60/247.58
     elif duration == "Year to Date":
         duration = "ytd"
         interval = "1wk"
-        sfactor = 150
+        sfactor = 150/247.58
     elif duration == "1 year":
         duration = "1y"
         interval = "1wk"
-        sfactor = 150
+        sfactor = 150/247.58
     elif duration == "5 years":
         duration = "5y"
         interval = "1mo"
-        sfactor = 400
+        sfactor = 400/247.58
     elif duration == "Max":
         duration = "max"
         interval = "1mo"
-        sfactor = 800
+        sfactor = 800/247.58
 
     ticker = yf.Ticker(company)
 
@@ -136,7 +136,7 @@ def stocks(username: str, company: str, duration: str = "1 day"):
 
     plt.plot(times, closingValues, color = color)
     plt.fill_between(times, closingValues, color = color)
-    plt.ylim(max(math.floor(min(closingValues))-sfactor, 0), math.ceil(max(closingValues))+min(sfactor//2, 150))
+    plt.ylim(max(math.floor(min(closingValues))-int(sfactor*max(closingValues)), 0), math.ceil(max(closingValues))+min(sfactor*max(closingValues), 150))
     plt.title(f"Status of {ticker.price[company]['shortName']}'s shares {big_duration}")
     plt.ylabel("Share price")
     plt.xlabel("Time")
