@@ -226,10 +226,10 @@ async def portfolio_remove(interaction: discord.Interaction, company: str = disc
 
 @portfolio.subcommand(name = "delete", description = "Delete your portfolio")
 async def portfolio_delete(interaction: discord.Interaction):
-    if delete_portfolio():
-        await interaction.send("Portfolio deleted!")
+    if delete_portfolio(interaction.user.id):
+        await interaction.send("Portfolio deleted!", ephemeral = True)
     else:
-        await interaction.send("You do not have a portfolio to delete!")
+        await interaction.send("You do not have a portfolio to delete!", ephemeral = True)
 
 @bot.slash_command(name = "trending", description = "Get the trending stocks")
 async def trending(interaction: discord.Interaction):
