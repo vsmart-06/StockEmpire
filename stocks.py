@@ -193,6 +193,8 @@ def getCrypto() -> list:
     screener = yf.Screener().get_screeners(["all_cryptocurrencies_us"], 5)
     crypto = screener["all_cryptocurrencies_us"]["quotes"]
     symbols = []
+    logo_urls = []
     for x in crypto:
         symbols.append(x["symbol"].lower())
-    return symbols
+        logo_urls.append(x["logoUrl"])
+    return symbols, logo_urls

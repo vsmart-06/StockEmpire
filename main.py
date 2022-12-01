@@ -338,14 +338,283 @@ async def days(interaction: discord.Interaction):
 
 @days.subcommand(name = "winners", description = "View today's winners")
 async def winners(interaction: discord.Interaction):
-    getWinners()
+    await interaction.response.defer()
+    winners_stocks = getWinners()
+    shares_embeds = []
+    for x in range(len(winners_stocks)):
+        company: str = winners_stocks[x]
+        stock_data = stocks(str(interaction.user), company)
+        shares_embed = discord.Embed(title = stock_data["name"], colour = discord.Colour.blue())
+        shares_embed.add_field(name = "Symbol", value = company.upper(), inline = False)
+        shares_embed.add_field(name = "Last Price", value = stock_data["Last Price"])
+        shares_embed.add_field(name = "Change", value = stock_data["Change"])
+        shares_embed.add_field(name = "Percentage Change", value = stock_data["Percentage Change"])
+
+        shares_embed.set_footer(text = f"Source: https://finance.yahoo.com/quote/{company.upper()}?p={company.upper()}")
+        shares_embeds.append(shares_embed)
+
+    view = discord.ui.View(timeout = 120)
+
+    async def timeout():
+        new_view = discord.ui.View(timeout = None)
+        for x in view.children:
+            button = x
+            button.disabled = True
+            new_view.add_item(button)
+        await interaction.edit_original_message(view = new_view)
+
+    view.on_timeout = timeout
+
+    def create_callback(company: str):
+        async def callback(btn_interaction: discord.Interaction):
+            if btn_interaction.user != interaction.user:
+                await btn_interaction.send("This is not for you!", ephemeral = True)
+                return
+            new_view = discord.ui.View(timeout = 120)
+            new_view.on_timeout = timeout
+            new_buttons = []
+            for x in winners_stocks:
+                new_buttons.append(discord.ui.Button(label = x.upper(), style = discord.ButtonStyle.blurple))
+            new_buttons[0].callback = create_callback(new_buttons[0].label.lower())
+            if winners_stocks.index(company) == 0:
+                new_buttons[0].disabled = True
+            new_view.add_item(new_buttons[0])
+            if len(new_buttons) >= 2:
+                new_buttons[1].callback = create_callback(new_buttons[1].label.lower())
+                if winners_stocks.index(company) == 1:
+                    new_buttons[1].disabled = True
+                new_view.add_item(new_buttons[1])
+            if len(new_buttons) >= 3:
+                new_buttons[2].callback = create_callback(new_buttons[2].label.lower())
+                if winners_stocks.index(company) == 2:
+                    new_buttons[2].disabled = True
+                new_view.add_item(new_buttons[2])
+            if len(new_buttons) >= 4:
+                new_buttons[3].callback = create_callback(new_buttons[3].label.lower())
+                if winners_stocks.index(company) == 3:
+                    new_buttons[3].disabled = True
+                new_view.add_item(new_buttons[3])
+            if len(new_buttons) >= 5:
+                new_buttons[4].callback = create_callback(new_buttons[4].label.lower())
+                if winners_stocks.index(company) == 4:
+                    new_buttons[4].disabled = True
+                new_view.add_item(new_buttons[4])
+            stock_data = stocks(str(btn_interaction.user), company)
+            shares_embed = discord.Embed(title = f"Summary of {stock_data['name']}'s shares {stock_data['duration']}", colour = discord.Colour.blue())
+            for field in list(stock_data.keys())[2:]:
+                shares_embed.add_field(name = field, value = stock_data[field])
+            shares_embed.set_footer(text = f"Source: https://finance.yahoo.com/quote/{company.upper()}?p={company.upper()}")
+            await btn_interaction.edit(content = "***"+stock_data["name"]+"***", file = discord.File(f"shares_{btn_interaction.user}_{company}.png"), embed = shares_embed, view = new_view)
+        
+        return callback
+
+    buttons = []
+    for x in winners_stocks:
+        buttons.append(discord.ui.Button(label = x.upper(), style = discord.ButtonStyle.blurple))
+    
+    buttons[0].callback = create_callback(buttons[0].label.lower())
+    view.add_item(buttons[0])
+    if len(buttons) >= 2:
+        buttons[1].callback = create_callback(buttons[1].label.lower())
+        view.add_item(buttons[1])
+    if len(buttons) >= 3:
+        buttons[2].callback = create_callback(buttons[2].label.lower())
+        view.add_item(buttons[2])
+    if len(buttons) >= 4:
+        buttons[3].callback = create_callback(buttons[3].label.lower())
+        view.add_item(buttons[3])
+    if len(buttons) >= 5:
+        buttons[4].callback = create_callback(buttons[4].label.lower())
+        view.add_item(buttons[4])
+
+    await interaction.send("***Today's winners***", embeds = shares_embeds, view = view)
 
 @days.subcommand(name = "losers", description = "View today's losers")
 async def losers(interaction: discord.Interaction):
-    getLosers()
+    await interaction.response.defer()
+    losers_stocks = getLosers()
+    shares_embeds = []
+    for x in range(len(losers_stocks)):
+        company: str = losers_stocks[x]
+        stock_data = stocks(str(interaction.user), company)
+        shares_embed = discord.Embed(title = stock_data["name"], colour = discord.Colour.blue())
+        shares_embed.add_field(name = "Symbol", value = company.upper(), inline = False)
+        shares_embed.add_field(name = "Last Price", value = stock_data["Last Price"])
+        shares_embed.add_field(name = "Change", value = stock_data["Change"])
+        shares_embed.add_field(name = "Percentage Change", value = stock_data["Percentage Change"])
+
+        shares_embed.set_footer(text = f"Source: https://finance.yahoo.com/quote/{company.upper()}?p={company.upper()}")
+        shares_embeds.append(shares_embed)
+
+    view = discord.ui.View(timeout = 120)
+
+    async def timeout():
+        new_view = discord.ui.View(timeout = None)
+        for x in view.children:
+            button = x
+            button.disabled = True
+            new_view.add_item(button)
+        await interaction.edit_original_message(view = new_view)
+
+    view.on_timeout = timeout
+
+    def create_callback(company: str):
+        async def callback(btn_interaction: discord.Interaction):
+            if btn_interaction.user != interaction.user:
+                await btn_interaction.send("This is not for you!", ephemeral = True)
+                return
+            new_view = discord.ui.View(timeout = 120)
+            new_view.on_timeout = timeout
+            new_buttons = []
+            for x in losers_stocks:
+                new_buttons.append(discord.ui.Button(label = x.upper(), style = discord.ButtonStyle.blurple))
+            new_buttons[0].callback = create_callback(new_buttons[0].label.lower())
+            if losers_stocks.index(company) == 0:
+                new_buttons[0].disabled = True
+            new_view.add_item(new_buttons[0])
+            if len(new_buttons) >= 2:
+                new_buttons[1].callback = create_callback(new_buttons[1].label.lower())
+                if losers_stocks.index(company) == 1:
+                    new_buttons[1].disabled = True
+                new_view.add_item(new_buttons[1])
+            if len(new_buttons) >= 3:
+                new_buttons[2].callback = create_callback(new_buttons[2].label.lower())
+                if losers_stocks.index(company) == 2:
+                    new_buttons[2].disabled = True
+                new_view.add_item(new_buttons[2])
+            if len(new_buttons) >= 4:
+                new_buttons[3].callback = create_callback(new_buttons[3].label.lower())
+                if losers_stocks.index(company) == 3:
+                    new_buttons[3].disabled = True
+                new_view.add_item(new_buttons[3])
+            if len(new_buttons) >= 5:
+                new_buttons[4].callback = create_callback(new_buttons[4].label.lower())
+                if losers_stocks.index(company) == 4:
+                    new_buttons[4].disabled = True
+                new_view.add_item(new_buttons[4])
+            stock_data = stocks(str(btn_interaction.user), company)
+            shares_embed = discord.Embed(title = f"Summary of {stock_data['name']}'s shares {stock_data['duration']}", colour = discord.Colour.blue())
+            for field in list(stock_data.keys())[2:]:
+                shares_embed.add_field(name = field, value = stock_data[field])
+            shares_embed.set_footer(text = f"Source: https://finance.yahoo.com/quote/{company.upper()}?p={company.upper()}")
+            await btn_interaction.edit(content = "***"+stock_data["name"]+"***", file = discord.File(f"shares_{btn_interaction.user}_{company}.png"), embed = shares_embed, view = new_view)
+        
+        return callback
+
+    buttons = []
+    for x in losers_stocks:
+        buttons.append(discord.ui.Button(label = x.upper(), style = discord.ButtonStyle.blurple))
+    
+    buttons[0].callback = create_callback(buttons[0].label.lower())
+    view.add_item(buttons[0])
+    if len(buttons) >= 2:
+        buttons[1].callback = create_callback(buttons[1].label.lower())
+        view.add_item(buttons[1])
+    if len(buttons) >= 3:
+        buttons[2].callback = create_callback(buttons[2].label.lower())
+        view.add_item(buttons[2])
+    if len(buttons) >= 4:
+        buttons[3].callback = create_callback(buttons[3].label.lower())
+        view.add_item(buttons[3])
+    if len(buttons) >= 5:
+        buttons[4].callback = create_callback(buttons[4].label.lower())
+        view.add_item(buttons[4])
+
+    await interaction.send("***Today's losers***", embeds = shares_embeds, view = view)
 
 @bot.slash_command(name = "crypto", description = "View the highest valued cryptocurrency stocks")
 async def crypto(interaction: discord.Interaction):
-    getCrypto()
+    await interaction.response.defer()
+    crypto_stocks, logo_urls = getCrypto()
+    shares_embeds = []
+    for x in range(len(crypto_stocks)):
+        company: str = crypto_stocks[x]
+        stock_data = stocks(str(interaction.user), company)
+        shares_embed = discord.Embed(title = stock_data["name"], colour = discord.Colour.blue())
+        shares_embed.add_field(name = "Symbol", value = company.upper(), inline = False)
+        shares_embed.add_field(name = "Last Price", value = stock_data["Last Price"])
+        shares_embed.add_field(name = "Change", value = stock_data["Change"])
+        shares_embed.add_field(name = "Percentage Change", value = stock_data["Percentage Change"])
+        shares_embed.set_thumbnail(url = logo_urls[x])
+
+        shares_embed.set_footer(text = f"Source: https://finance.yahoo.com/quote/{company.upper()}?p={company.upper()}")
+        shares_embeds.append(shares_embed)
+
+    view = discord.ui.View(timeout = 120)
+
+    async def timeout():
+        new_view = discord.ui.View(timeout = None)
+        for x in view.children:
+            button = x
+            button.disabled = True
+            new_view.add_item(button)
+        await interaction.edit_original_message(view = new_view)
+
+    view.on_timeout = timeout
+
+    def create_callback(company: str):
+        async def callback(btn_interaction: discord.Interaction):
+            if btn_interaction.user != interaction.user:
+                await btn_interaction.send("This is not for you!", ephemeral = True)
+                return
+            new_view = discord.ui.View(timeout = 120)
+            new_view.on_timeout = timeout
+            new_buttons = []
+            for x in crypto_stocks:
+                new_buttons.append(discord.ui.Button(label = x.upper(), style = discord.ButtonStyle.blurple))
+            new_buttons[0].callback = create_callback(new_buttons[0].label.lower())
+            if crypto_stocks.index(company) == 0:
+                new_buttons[0].disabled = True
+            new_view.add_item(new_buttons[0])
+            if len(new_buttons) >= 2:
+                new_buttons[1].callback = create_callback(new_buttons[1].label.lower())
+                if crypto_stocks.index(company) == 1:
+                    new_buttons[1].disabled = True
+                new_view.add_item(new_buttons[1])
+            if len(new_buttons) >= 3:
+                new_buttons[2].callback = create_callback(new_buttons[2].label.lower())
+                if crypto_stocks.index(company) == 2:
+                    new_buttons[2].disabled = True
+                new_view.add_item(new_buttons[2])
+            if len(new_buttons) >= 4:
+                new_buttons[3].callback = create_callback(new_buttons[3].label.lower())
+                if crypto_stocks.index(company) == 3:
+                    new_buttons[3].disabled = True
+                new_view.add_item(new_buttons[3])
+            if len(new_buttons) >= 5:
+                new_buttons[4].callback = create_callback(new_buttons[4].label.lower())
+                if crypto_stocks.index(company) == 4:
+                    new_buttons[4].disabled = True
+                new_view.add_item(new_buttons[4])
+            stock_data = stocks(str(btn_interaction.user), company)
+            shares_embed = discord.Embed(title = f"Summary of {stock_data['name']}'s shares {stock_data['duration']}", colour = discord.Colour.blue())
+            for field in list(stock_data.keys())[2:]:
+                shares_embed.add_field(name = field, value = stock_data[field])
+            shares_embed.set_thumbnail(url = logo_urls[crypto_stocks.index(company)])
+            shares_embed.set_footer(text = f"Source: https://finance.yahoo.com/quote/{company.upper()}?p={company.upper()}")
+            await btn_interaction.edit(content = "***"+stock_data["name"]+"***", file = discord.File(f"shares_{btn_interaction.user}_{company}.png"), embed = shares_embed, view = new_view)
+        
+        return callback
+
+    buttons = []
+    for x in crypto_stocks:
+        buttons.append(discord.ui.Button(label = x.upper(), style = discord.ButtonStyle.blurple))
+    
+    buttons[0].callback = create_callback(buttons[0].label.lower())
+    view.add_item(buttons[0])
+    if len(buttons) >= 2:
+        buttons[1].callback = create_callback(buttons[1].label.lower())
+        view.add_item(buttons[1])
+    if len(buttons) >= 3:
+        buttons[2].callback = create_callback(buttons[2].label.lower())
+        view.add_item(buttons[2])
+    if len(buttons) >= 4:
+        buttons[3].callback = create_callback(buttons[3].label.lower())
+        view.add_item(buttons[3])
+    if len(buttons) >= 5:
+        buttons[4].callback = create_callback(buttons[4].label.lower())
+        view.add_item(buttons[4])
+
+    await interaction.send("***Highest valued cryptocurrency stocks***", embeds = shares_embeds, view = view)
 
 bot.run(token)
