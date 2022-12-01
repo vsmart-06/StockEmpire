@@ -141,6 +141,6 @@ def stocks(username: str, company: str, duration: str = "1 day"):
     plt.ylabel("Share price")
     plt.xlabel("Time")
     plt.tick_params(labelbottom = False)
-    plt.savefig(f"shares_{username}.png")
+    plt.savefig(f"shares_{username}_{company}.png")
     plt.close()
     return data

@@ -4,6 +4,7 @@ import dotenv
 import os
 from stocks import stocks
 from records import add_ticker, remove_ticker, get_portfolio
+from copy import deepcopy
 
 dotenv.load_dotenv()
 
@@ -28,7 +29,70 @@ async def ticker(interaction: discord.Interaction, company: str = discord.SlashO
 
         shares_embed.set_footer(text = f"Source: https://finance.yahoo.com/quote/{company.upper()}?p={company.upper()}")
 
-        await interaction.send(content = "***"+stock_data["name"]+"***", file = discord.File(f"shares_{interaction.user}.png"), embed = shares_embed)
+        view = discord.ui.View(timeout = 120)
+        async def timeout():
+            new_view = discord.ui.View(timeout = None)
+            for x in view.children:
+                button = x
+                button.disabled = True
+                new_view.add_item(button)
+            await interaction.edit_original_message(view = new_view)
+        view.on_timeout = timeout
+
+        buttons = []
+        durations = ["1 day", "5 days", "1 month", "6 months", "Year to Date", "1 year", "5 years", "Max"]
+        for x in durations:
+            button = discord.ui.Button(label = x, style = discord.ButtonStyle.blurple)
+            if duration == x:
+                button.disabled = True
+            buttons.append(button)
+        
+        def create_callback(duration):
+            async def callback(interaction: discord.Interaction):
+                new_buttons = []
+                for x in durations:
+                    button = discord.ui.Button(label = x, style = discord.ButtonStyle.blurple)
+                    if duration == x:
+                        button.disabled = True
+                    new_buttons.append(button)
+                new_buttons[0].callback = create_callback("1 day")
+                new_buttons[1].callback = create_callback("5 days")
+                new_buttons[2].callback = create_callback("1 month")
+                new_buttons[3].callback = create_callback("6 months")
+                new_buttons[4].callback = create_callback("Year to Date")
+                new_buttons[5].callback = create_callback("1 year")
+                new_buttons[6].callback = create_callback("5 years")
+                new_buttons[7].callback = create_callback("Max")
+                new_view = discord.ui.View(timeout = 120)
+                new_view.on_timeout = timeout
+                for x in new_buttons:
+                    new_view.add_item(x)
+
+                new_stock_data = stocks(str(interaction.user), company, duration)
+                new_shares_embed = discord.Embed(title = f"Summary of {new_stock_data['name']}'s shares {new_stock_data['duration']}", colour = discord.Colour.blue())
+                for field in list(new_stock_data.keys())[2:]:
+                    new_shares_embed.add_field(name = field, value = new_stock_data[field])
+
+                new_shares_embed.set_footer(text = f"Source: https://finance.yahoo.com/quote/{company.upper()}?p={company.upper()}")
+
+                await interaction.edit(file = discord.File(f"shares_{interaction.user}_{company}.png"), embed = new_shares_embed, view = new_view)
+
+            return callback
+        
+        buttons[0].callback = create_callback("1 day")
+        buttons[1].callback = create_callback("5 days")
+        buttons[2].callback = create_callback("1 month")
+        buttons[3].callback = create_callback("6 months")
+        buttons[4].callback = create_callback("Year to Date")
+        buttons[5].callback = create_callback("1 year")
+        buttons[6].callback = create_callback("5 years")
+        buttons[7].callback = create_callback("Max")
+
+        for x in buttons:
+            view.add_item(x)
+
+
+        await interaction.send(content = "***"+stock_data["name"]+"***", file = discord.File(f"shares_{interaction.user}_{company}.png"), embed = shares_embed, view = view)
     
     else:
         await interaction.send("Invalid company symbol", ephemeral = True)
@@ -41,16 +105,62 @@ async def portfolio(interaction: discord.Interaction):
 async def portfolio_view(interaction: discord.Interaction):
     user_portfolio = get_portfolio(interaction.user.id)
     if user_portfolio:
+        shares_embeds = []
         for x in range(len(user_portfolio)):
             company: str = user_portfolio[x]
             stock_data = stocks(str(interaction.user), company)
-            shares_embed = discord.Embed(title = f"Summary of {stock_data['name']}'s shares {stock_data['duration']}", colour = discord.Colour.blue())
-            for field in list(stock_data.keys())[2:]:
-                shares_embed.add_field(name = field, value = stock_data[field])
+            shares_embed = discord.Embed(title = stock_data["name"], colour = discord.Colour.blue())
+            shares_embed.add_field(name = "Symbol", value = company.upper(), inline = False)
+            shares_embed.add_field(name = "Last Price", value = stock_data["Last Price"])
+            shares_embed.add_field(name = "Change", value = stock_data["Change"])
+            shares_embed.add_field(name = "Percentage Change", value = stock_data["Percentage Change"])
 
             shares_embed.set_footer(text = f"Source: https://finance.yahoo.com/quote/{company.upper()}?p={company.upper()}")
+            shares_embeds.append(shares_embed)
 
-            await interaction.send(content = "***"+stock_data["name"]+"***", file = discord.File(f"shares_{interaction.user}.png"), embed = shares_embed)
+        view = discord.ui.View(timeout = 120)
+        
+        async def timeout():
+            new_view = discord.ui.View(timeout = None)
+            for x in view.children:
+                button = x
+                button.disabled = True
+                new_view.add_item(button)
+            await interaction.edit_original_message(view = new_view)
+
+        view.on_timeout = timeout
+
+        def create_callback(company: str):
+            async def callback(interaction: discord.Interaction):
+                stock_data = stocks(str(interaction.user), company)
+                shares_embed = discord.Embed(title = f"Summary of {stock_data['name']}'s shares {stock_data['duration']}", colour = discord.Colour.blue())
+                for field in list(stock_data.keys())[2:]:
+                    shares_embed.add_field(name = field, value = stock_data[field])
+                shares_embed.set_footer(text = f"Source: https://finance.yahoo.com/quote/{company.upper()}?p={company.upper()}")
+                await interaction.edit(content = "***"+stock_data["name"]+"***", file = discord.File(f"shares_{interaction.user}_{company}.png"), embed = shares_embed, view = None)
+            
+            return callback
+
+        buttons = []
+        for x in user_portfolio:
+            buttons.append(discord.ui.Button(label = x.upper(), style = discord.ButtonStyle.blurple))
+        
+        buttons[0].callback = create_callback(buttons[0].label.lower())
+        view.add_item(buttons[0])
+        if len(buttons) >= 2:
+            buttons[1].callback = create_callback(buttons[1].label.lower())
+            view.add_item(buttons[1])
+        if len(buttons) >= 3:
+            buttons[2].callback = create_callback(buttons[2].label.lower())
+            view.add_item(buttons[2])
+        if len(buttons) >= 4:
+            buttons[3].callback = create_callback(buttons[3].label.lower())
+            view.add_item(buttons[3])
+        if len(buttons) >= 5:
+            buttons[4].callback = create_callback(buttons[4].label.lower())
+            view.add_item(buttons[4])
+
+        await interaction.send("***Your portfolio***", embeds = shares_embeds, view = view)
 
     else:
         await interaction.send("You have not created a portfolio yet!", ephemeral = True)
