@@ -152,7 +152,7 @@ def get_portfolio(id: int):
         conn.close()
         return portfolio
     
-    except db.errors.OperationalError:
+    except:
         return False
 
 c.close()

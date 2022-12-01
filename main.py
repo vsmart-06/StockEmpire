@@ -47,7 +47,10 @@ async def ticker(interaction: discord.Interaction, company: str = discord.SlashO
             buttons.append(button)
         
         def create_callback(duration):
-            async def callback(interaction: discord.Interaction):
+            async def callback(btn_interaction: discord.Interaction):
+                if btn_interaction.user != interaction.user:
+                    await btn_interaction.send("This is not for you!", ephemeral = True)
+                    return
                 new_buttons = []
                 for x in durations:
                     button = discord.ui.Button(label = x, style = discord.ButtonStyle.blurple)
@@ -67,14 +70,14 @@ async def ticker(interaction: discord.Interaction, company: str = discord.SlashO
                 for x in new_buttons:
                     new_view.add_item(x)
 
-                new_stock_data = stocks(str(interaction.user), company, duration)
+                new_stock_data = stocks(str(btn_interaction.user), company, duration)
                 new_shares_embed = discord.Embed(title = f"Summary of {new_stock_data['name']}'s shares {new_stock_data['duration']}", colour = discord.Colour.blue())
                 for field in list(new_stock_data.keys())[2:]:
                     new_shares_embed.add_field(name = field, value = new_stock_data[field])
 
                 new_shares_embed.set_footer(text = f"Source: https://finance.yahoo.com/quote/{company.upper()}?p={company.upper()}")
 
-                await interaction.edit(file = discord.File(f"shares_{interaction.user}_{company}.png"), embed = new_shares_embed, view = new_view)
+                await btn_interaction.edit(file = discord.File(f"shares_{btn_interaction.user}_{company}.png"), embed = new_shares_embed, view = new_view)
 
             return callback
         
@@ -130,7 +133,10 @@ async def portfolio_view(interaction: discord.Interaction):
         view.on_timeout = timeout
 
         def create_callback(company: str):
-            async def callback(interaction: discord.Interaction):
+            async def callback(btn_interaction: discord.Interaction):
+                if btn_interaction.user != interaction.user:
+                    await btn_interaction.send("This is not for you!", ephemeral = True)
+                    return
                 new_view = discord.ui.View(timeout = 120)
                 new_view.on_timeout = timeout
                 new_buttons = []
@@ -160,12 +166,12 @@ async def portfolio_view(interaction: discord.Interaction):
                     if user_portfolio.index(company) == 4:
                         new_buttons[4].disabled = True
                     new_view.add_item(new_buttons[4])
-                stock_data = stocks(str(interaction.user), company)
+                stock_data = stocks(str(btn_interaction.user), company)
                 shares_embed = discord.Embed(title = f"Summary of {stock_data['name']}'s shares {stock_data['duration']}", colour = discord.Colour.blue())
                 for field in list(stock_data.keys())[2:]:
                     shares_embed.add_field(name = field, value = stock_data[field])
                 shares_embed.set_footer(text = f"Source: https://finance.yahoo.com/quote/{company.upper()}?p={company.upper()}")
-                await interaction.edit(content = "***"+stock_data["name"]+"***", file = discord.File(f"shares_{interaction.user}_{company}.png"), embed = shares_embed, view = new_view)
+                await btn_interaction.edit(content = "***"+stock_data["name"]+"***", file = discord.File(f"shares_{btn_interaction.user}_{company}.png"), embed = shares_embed, view = new_view)
             
             return callback
 
@@ -222,15 +228,15 @@ async def portfolio_view(interaction: discord.Interaction, company: str = discor
 async def trending(interaction: discord.Interaction):
     getTrending()
 
-@bot.slash_command(name = "day's", description = "View the day's winners/losers")
+@bot.slash_command(name = "todays", description = "View today's winners/losers")
 async def days(interaction: discord.Interaction):
     pass
 
-@days.subcommand(name = "winners", description = "View the day's winners")
+@days.subcommand(name = "winners", description = "View today's winners")
 async def winners(interaction: discord.Interaction):
     getWinners()
 
-@days.subcommand(name = "losers", description = "View the day's losers")
+@days.subcommand(name = "losers", description = "View today's losers")
 async def losers(interaction: discord.Interaction):
     getLosers()
 
