@@ -153,6 +153,29 @@ def get_portfolio(id: int):
         return portfolio
     
     except:
+        c.close()
+        conn.close()
+        return False
+
+def delete_portfolio(id: int):
+    conn = db.connect(
+    host = h,
+    user = u,
+    password = p,
+    database = d
+    )
+    c = conn.cursor()
+
+    try:
+        c.execute(f"DELETE FROM user_portfolios WHERE user_id = {id}")
+        conn.commit()
+        c.close()
+        conn.close()
+        return True
+
+    except:
+        c.close()
+        conn.close()
         return False
 
 c.close()
