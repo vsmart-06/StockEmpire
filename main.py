@@ -119,7 +119,7 @@ async def portfolio_view(interaction: discord.Interaction):
             shares_embeds.append(shares_embed)
 
         view = discord.ui.View(timeout = 120)
-        
+
         async def timeout():
             new_view = discord.ui.View(timeout = None)
             for x in view.children:
@@ -132,12 +132,41 @@ async def portfolio_view(interaction: discord.Interaction):
 
         def create_callback(company: str):
             async def callback(interaction: discord.Interaction):
+                new_view = discord.ui.View(timeout = 120)
+                new_view.on_timeout = timeout
+                new_buttons = []
+                for x in user_portfolio:
+                    new_buttons.append(discord.ui.Button(label = x.upper(), style = discord.ButtonStyle.blurple))
+                new_buttons[0].callback = create_callback(new_buttons[0].label.lower())
+                if user_portfolio.index(company) == 0:
+                    new_buttons[0].disabled = True
+                new_view.add_item(new_buttons[0])
+                if len(new_buttons) >= 2:
+                    new_buttons[1].callback = create_callback(new_buttons[1].label.lower())
+                    if user_portfolio.index(company) == 1:
+                        new_buttons[1].disabled = True
+                    new_view.add_item(new_buttons[1])
+                if len(new_buttons) >= 3:
+                    new_buttons[2].callback = create_callback(new_buttons[2].label.lower())
+                    if user_portfolio.index(company) == 2:
+                        new_buttons[2].disabled = True
+                    new_view.add_item(new_buttons[2])
+                if len(new_buttons) >= 4:
+                    new_buttons[3].callback = create_callback(new_buttons[3].label.lower())
+                    if user_portfolio.index(company) == 3:
+                        new_buttons[3].disabled = True
+                    new_view.add_item(new_buttons[3])
+                if len(new_buttons) >= 5:
+                    new_buttons[4].callback = create_callback(new_buttons[4].label.lower())
+                    if user_portfolio.index(company) == 4:
+                        new_buttons[4].disabled = True
+                    new_view.add_item(new_buttons[4])
                 stock_data = stocks(str(interaction.user), company)
                 shares_embed = discord.Embed(title = f"Summary of {stock_data['name']}'s shares {stock_data['duration']}", colour = discord.Colour.blue())
                 for field in list(stock_data.keys())[2:]:
                     shares_embed.add_field(name = field, value = stock_data[field])
                 shares_embed.set_footer(text = f"Source: https://finance.yahoo.com/quote/{company.upper()}?p={company.upper()}")
-                await interaction.edit(content = "***"+stock_data["name"]+"***", file = discord.File(f"shares_{interaction.user}_{company}.png"), embed = shares_embed, view = None)
+                await interaction.edit(content = "***"+stock_data["name"]+"***", file = discord.File(f"shares_{interaction.user}_{company}.png"), embed = shares_embed, view = new_view)
             
             return callback
 
