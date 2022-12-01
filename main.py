@@ -3,7 +3,7 @@ from nextcord.ext import commands
 import dotenv
 import os
 from stocks import stocks, getTrending, getWinners, getLosers, getCrypto
-from records import add_ticker, remove_ticker, get_portfolio, delete_portfolio
+from records import add_ticker, remove_ticker, get_portfolio, delete_portfolio, isCompany
 
 dotenv.load_dotenv()
 
@@ -21,8 +21,9 @@ async def ticker(interaction: discord.Interaction, company: str = discord.SlashO
     if not duration:
         duration = "1 day"
 
-    stock_data = stocks(str(interaction.user), company, duration)
-    if stock_data:
+    if isCompany(company):
+        await interaction.response.defer()
+        stock_data = stocks(str(interaction.user), company, duration)
         shares_embed = discord.Embed(title = f"Summary of {stock_data['name']}'s shares {stock_data['duration']}", colour = discord.Colour.blue())
         for field in list(stock_data.keys())[2:]:
             shares_embed.add_field(name = field, value = stock_data[field])
@@ -108,6 +109,7 @@ async def portfolio(interaction: discord.Interaction):
 async def portfolio_view(interaction: discord.Interaction):
     user_portfolio = get_portfolio(interaction.user.id)
     if user_portfolio:
+        await interaction.response.defer()
         shares_embeds = []
         for x in range(len(user_portfolio)):
             company: str = user_portfolio[x]
@@ -202,6 +204,7 @@ async def portfolio_view(interaction: discord.Interaction):
 
 @portfolio.subcommand(name = "add", description = "Add a ticker to your portfolio")
 async def portfolio_add(interaction: discord.Interaction, company: str = discord.SlashOption(name = "company", description = "The symbol of the company you would like to add to your portfolio", required = True)):
+    await interaction.response.defer(ephemeral = True)
     result = add_ticker(interaction.user.id, company)
     if result == 0:
         await interaction.send("Invalid company symbol", ephemeral = True)
@@ -215,6 +218,7 @@ async def portfolio_add(interaction: discord.Interaction, company: str = discord
 
 @portfolio.subcommand(name = "remove", description = "Remove a ticker from your portfolio")
 async def portfolio_remove(interaction: discord.Interaction, company: str = discord.SlashOption(name = "company", description = "The symbol of the company you would like to remove from your portfolio", required = True)):
+    await interaction.response.defer(ephemeral = True)
     result = remove_ticker(interaction.user.id, company)
     if result == 0:
         await interaction.send("Invalid company symbol", ephemeral = True)
@@ -227,6 +231,7 @@ async def portfolio_remove(interaction: discord.Interaction, company: str = disc
 
 @portfolio.subcommand(name = "delete", description = "Delete your portfolio")
 async def portfolio_delete(interaction: discord.Interaction):
+    await interaction.response.defer(ephemeral = True)
     if delete_portfolio(interaction.user.id):
         await interaction.send("Portfolio deleted!", ephemeral = True)
     else:
