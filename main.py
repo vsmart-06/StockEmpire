@@ -14,6 +14,7 @@ bot = commands.Bot()
 @bot.event
 async def on_ready():
     print("Stocks run amok!")
+    await bot.change_presence(activity = discord.Game("Stocks run amok!"))
 
 @bot.slash_command(name = "ticker", description = "View the status of a company's shares")
 async def ticker(interaction: discord.Interaction, company: str = discord.SlashOption(name = "company", description = "The symbol of the company", required = True), duration: str = discord.SlashOption(name = "duration", description = "The time period over which the share prices will be shown", choices = ["1 day", "5 days", "1 month", "6 months", "Year to Date", "1 year", "5 years", "Max"], required = False)):
