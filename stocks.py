@@ -145,23 +145,23 @@ def stocks(username: str, company: str, duration: str = "1 day"):
     plt.close()
     return data
 
-def getTrending():
+def getTrending() -> list:
     trending = yf.get_trending()
     symbols = []
     for x in trending["quotes"]:
         symbols.append(x["symbol"])
     return symbols
 
-def getWinners(num: int) -> list:
-    screener = yf.Screener().get_screeners(["day_gainers"], num)
+def getWinners() -> list:
+    screener = yf.Screener().get_screeners(["day_gainers"], 5)
     gainers = screener["day_gainers"]["quotes"]
     symbols = []
     for x in gainers:
         symbols.append(x["symbol"])
     return symbols
 
-def getLosers(num: int) -> list:
-    screener = yf.Screener().get_screeners(["day_losers"], num)
+def getLosers() -> list:
+    screener = yf.Screener().get_screeners(["day_losers"], 5)
     losers = screener["day_losers"]["quotes"]
     symbols = []
     for x in losers:
@@ -169,8 +169,8 @@ def getLosers(num: int) -> list:
     return symbols
     
 
-def getCrypto(num: int) -> list:
-    screener = yf.Screener().get_screeners(["all_cryptocurrencies_us"], num)
+def getCrypto() -> list:
+    screener = yf.Screener().get_screeners(["all_cryptocurrencies_us"], 5)
     crypto = screener["all_cryptocurrencies_us"]["quotes"]
     symbols = []
     for x in crypto:
