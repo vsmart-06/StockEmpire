@@ -149,24 +149,42 @@ def getTrending() -> list:
     trending = yf.get_trending()
     symbols = []
     for x in trending["quotes"]:
-        symbols.append(x["symbol"])
-    return symbols
+        company = True
+        for a in x["symbol"]:
+            if not(a.isalpha() or a.isnumeric() or a in [".", "-"]):
+                company = False
+                break
+        if company:
+            symbols.append(x["symbol"].lower())
+    return symbols[:5]
 
 def getWinners() -> list:
-    screener = yf.Screener().get_screeners(["day_gainers"], 5)
+    screener = yf.Screener().get_screeners(["day_gainers"])
     gainers = screener["day_gainers"]["quotes"]
     symbols = []
     for x in gainers:
-        symbols.append(x["symbol"])
-    return symbols
+        company = True
+        for a in x["symbol"]:
+            if not(a.isalpha() or a.isnumeric() or a in [".", "-"]):
+                company = False
+                break
+        if company:
+            symbols.append(x["symbol"].lower())
+    return symbols[:5]
 
 def getLosers() -> list:
-    screener = yf.Screener().get_screeners(["day_losers"], 5)
+    screener = yf.Screener().get_screeners(["day_losers"])
     losers = screener["day_losers"]["quotes"]
     symbols = []
     for x in losers:
-        symbols.append(x["symbol"])
-    return symbols
+        company = True
+        for a in x["symbol"]:
+            if not(a.isalpha() or a.isnumeric() or a in [".", "-"]):
+                company = False
+                break
+        if company:
+            symbols.append(x["symbol"].lower())
+    return symbols[:5]
     
 
 def getCrypto() -> list:
@@ -174,5 +192,5 @@ def getCrypto() -> list:
     crypto = screener["all_cryptocurrencies_us"]["quotes"]
     symbols = []
     for x in crypto:
-        symbols.append(x["symbol"])
+        symbols.append(x["symbol"].lower())
     return symbols
