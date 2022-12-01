@@ -77,27 +77,29 @@ def stocks(username: str, company: str, duration: str = "1 day"):
             time += 30*24*60
 
     if duration == "1d":
-        if closingValues[-1] >= summary[company]["previousClose"]:
+        if closingValues[-1] > summary[company]["previousClose"]:
             color = "green"
         else:
             color = "red"
     
     elif duration == "5d":
-        if closingValues[-1] >= lastMarkClose:
+        if closingValues[-1] > lastMarkClose:
             color = "green"
         else:
             color = "red"
 
     else:
-        if closingValues[-1] >= openingValues[0]:
+        if closingValues[-1] > openingValues[0]:
             color = "green"
         else:
             color = "red"
     
     if duration == "1d":
         big_duration = "for 1 day"
-
-        data = {"name": ticker.price[company]['shortName'], "duration": big_duration, "Last Price": "**"+str(round(closingValues[-1], 2))+"**", "Change": "**"+str(round(round(closingValues[-1], 2)-summary[company]["previousClose"], 2))+"**", "Percentage Change": f'**{round(100*(round(closingValues[-1], 2)-summary[company]["previousClose"])/summary[company]["previousClose"], 2)}%**', "Previous Close": summary[company]["previousClose"], "Open": summary[company]["open"], "Bid": f"{summary[company]['bid']} x {summary[company]['bidSize']}", "Ask": f"{summary[company]['ask']} x {summary[company]['askSize']}", "Day's Range": f"{summary[company]['dayLow']} - {summary[company]['dayHigh']}", "Volume": summary[company]["volume"], "Average Volume": summary[company]["averageVolume"], "Market Cap": f'{round((summary[company]["marketCap"])/10**(len(str(summary[company]["marketCap"]))-1), 3)} x 10^{len(str(summary[company]["marketCap"]))-1}'}
+        try:
+            data = {"name": ticker.price[company]['shortName'], "duration": big_duration, "Last Price": "**"+str(round(closingValues[-1], 2))+"**", "Change": "**"+str(round(round(closingValues[-1], 2)-summary[company]["previousClose"], 2))+"**", "Percentage Change": f'**{round(100*(round(closingValues[-1], 2)-summary[company]["previousClose"])/summary[company]["previousClose"], 2)}%**'}
+        except:
+            data = {"name": ticker.price[company]['shortName'], "duration": big_duration, "Last Price": "**"+str(round(closingValues[-1], 2))+"**", "Change": "**"+str(round(round(closingValues[-1], 2)-summary[company]["previousClose"], 2))+"**", "Percentage Change": f'**{round(100*(round(closingValues[-1], 2)-summary[company]["previousClose"])/summary[company]["previousClose"], 2)}%**', "Previous Close": summary[company]["previousClose"], "Open": summary[company]["open"], "Bid": f"{summary[company]['bid']} x {summary[company]['bidSize']}", "Ask": f"{summary[company]['ask']} x {summary[company]['askSize']}", "Day's Range": f"{summary[company]['dayLow']} - {summary[company]['dayHigh']}", "Volume": summary[company]["volume"], "Average Volume": summary[company]["averageVolume"], "Market Cap": f'{round((summary[company]["marketCap"])/10**(len(str(summary[company]["marketCap"]))-1), 3)} x 10^{len(str(summary[company]["marketCap"]))-1}'}
 
     elif duration == "5d":
         big_duration = "for 5 days"
