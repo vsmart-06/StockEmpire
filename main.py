@@ -2,9 +2,8 @@ import nextcord as discord
 from nextcord.ext import commands
 import dotenv
 import os
-from stocks import stocks
+from stocks import stocks, getTrending, getWinners, getLosers, getCrypto
 from records import add_ticker, remove_ticker, get_portfolio
-from copy import deepcopy
 
 dotenv.load_dotenv()
 
@@ -218,5 +217,25 @@ async def portfolio_view(interaction: discord.Interaction, company: str = discor
         await interaction.send("You have not created a portfolio yet!", ephemeral = True)
     else:
         await interaction.send("Ticker removed!", ephemeral = True)
+
+@bot.slash_command(name = "trending", description = "Get the trending stocks")
+async def trending(interaction: discord.Interaction):
+    getTrending()
+
+@bot.slash_command(name = "day's", description = "View the day's winners/losers")
+async def days(interaction: discord.Interaction):
+    pass
+
+@days.subcommand(name = "winners", description = "View the day's winners")
+async def winners(interaction: discord.Interaction):
+    getWinners()
+
+@days.subcommand(name = "losers", description = "View the day's losers")
+async def losers(interaction: discord.Interaction):
+    getLosers()
+
+@bot.slash_command(name = "crypto", description = "View the highest valued cryptocurrency stocks")
+async def crypto(interaction: discord.Interaction):
+    getCrypto()
 
 bot.run(token)
