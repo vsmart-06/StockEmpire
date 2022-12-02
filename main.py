@@ -15,6 +15,40 @@ bot = commands.Bot()
 async def on_ready():
     print("Stocks run amok!")
     await bot.change_presence(activity = discord.Game("Stocks run amok!"))
+    my_user = await bot.fetch_user(706855396828250153)
+    await my_user.send("Stocks run amok!")
+    bot_count = bot.get_channel(1048220491451748404)
+    await bot_count.edit(name = f"Servers: {len(bot.guilds)}")
+
+@bot.event
+async def on_guild_join(guild: discord.Guild):
+    my_user = await bot.fetch_user(706855396828250153)
+    await my_user.send("New server: "+str(guild))
+    new_server = discord.Embed(title = "Thanks for inviting me!", description = "Hey there! Thanks a lot for inviting me to your server! Here are a few commands and links you should check out first:", colour = discord.Colour.blue())
+    new_server.add_field(name = "Commands", value = '''
+</ticker:1047164838566187039>: View the status of a company's shares
+</trending:1047856158792220753>: Get the trending stocks
+</portfolio add:1047164840789168138>: Add a ticker to you portfolio
+''')
+    new_server.add_field(name = "Important links", value = '''
+[Support Server](https://discord.gg/2WSSCZ8Yye): Get some help with any queries that you have!
+[Invite](https://discord.com/oauth2/authorize?client_id=1045722628465377350&permissions=274878220352&scope=bot%20applications.commands): Invite the bot to another server!
+''')
+    channel = guild.system_channel
+    if channel != None:
+        try:
+            await channel.send(embed = new_server)
+        except discord.errors.Forbidden:
+            pass
+    bot_count = bot.get_channel(1048220491451748404)
+    await bot_count.edit(name = f"Servers: {len(bot.guilds)}")
+
+@bot.event
+async def on_guild_remove(guild: discord.Guild):
+    my_user = await bot.fetch_user(706855396828250153)
+    await my_user.send("Removed from: "+str(guild))
+    bot_count = bot.get_channel(1048220491451748404)
+    await bot_count.edit(name = f"Servers: {len(bot.guilds)}")
 
 @bot.slash_command(name = "ticker", description = "View the status of a company's shares")
 async def ticker(interaction: discord.Interaction, company: str = discord.SlashOption(name = "company", description = "The symbol of the company", required = True), duration: str = discord.SlashOption(name = "duration", description = "The time period over which the share prices will be shown", choices = ["1 day", "5 days", "1 month", "6 months", "Year to Date", "1 year", "5 years", "Max"], required = False)):
@@ -616,5 +650,31 @@ async def crypto(interaction: discord.Interaction):
         view.add_item(buttons[4])
 
     await interaction.send("***Highest valued cryptocurrency stocks***", embeds = shares_embeds, view = view)
+
+@bot.slash_command(name = "invite", description = "Send an invite link for the bot")
+async def invite(interaction: discord.Interaction):
+    invite_embed = discord.Embed(title = "Invite me to your server!", description = "Use this link to invite me: https://dsc.gg/stockempire", colour = discord.Colour.blue())
+    await interaction.send(embed = invite_embed)
+
+@bot.slash_command(name = "support", description = "Send an invite link for the support server")
+async def support(interaction: discord.Interaction):
+    support_embed = discord.Embed(title = "Join the official StockEmpire support server!", description = "Use this link to join the server: https://dsc.gg/stockempire-support", colour = discord.Colour.blue())
+    await interaction.send(embed = support_embed)
+
+@bot.slash_command(name = "help", description = "View the help page of the bot")
+async def help(interaction: discord.Interaction):
+    help_embed = discord.Embed(title = "Information about the StockEmpire bot", description = "StockEmpire is a Discord Bot that supercharges your financial journey by bringing to you the latest and most useful financial data straight from Yahoo Finance - the most popular source of financial news, information, and data.", colour = discord.Colour.blue())
+    help_embed.add_field(name = "Commands:", value = '''</ticker:1047164838566187039>: View the status of a company's shares
+</portfolio view:1047164840789168138>: View your portfolio
+</portfolio add:1047164840789168138>: Add a ticker to your portfolio
+</portfolio remove:1047164840789168138>: Remove a ticker from your portfolio
+</portfolio delete:1047164840789168138>: Delete your portfolio
+</trending:1047856158792220753>: Get the trending stocks
+</todays winners:1047856160407035978>: View today's winners
+</todays losers:1047856160407035978> View today's losers
+</crypto:1047856156770574376> View the highest values cryptocurrency stocks
+''')
+    help_embed.add_field(name = "The Nexus:", value = "[Invite Me](https://discord.com/oauth2/authorize?client_id=1045722628465377350&permissions=274878220352&scope=bot%20applications.commands) · [Support Server](https://discord.gg/2WSSCZ8Yye)")
+    await interaction.send(embed = help_embed)
 
 bot.run(token)
