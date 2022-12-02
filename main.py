@@ -34,7 +34,7 @@ async def on_guild_join(guild: discord.Guild):
     new_server.add_field(name = "Important links", value = '''
 [Support Server](https://discord.gg/2WSSCZ8Yye): Get some help with any queries that you have!
 [Invite](https://discord.com/oauth2/authorize?client_id=1045722628465377350&permissions=274878220352&scope=bot%20applications.commands): Invite the bot to another server!
-''')
+''', inline = False)
     channel = guild.system_channel
     if channel != None:
         try:
