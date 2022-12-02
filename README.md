@@ -14,6 +14,7 @@ StockEmpire has the following features:
 
 ## 🔗 Links
 Bot invite: https://dsc.gg/stockempire
+
 Support Server: https://dsc.gg/stockempire-support
 
 ## ⚖ License
