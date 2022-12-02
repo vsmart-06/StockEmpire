@@ -26,6 +26,7 @@ async def on_guild_join(guild: discord.Guild):
     await my_user.send("New server: "+str(guild))
     new_server = discord.Embed(title = "Thanks for inviting me!", description = "Hey there! Thanks a lot for inviting me to your server! Here are a few commands and links you should check out first:", colour = discord.Colour.blue())
     new_server.add_field(name = "Commands", value = '''
+</help:1048240312683868272>: View the help page of the bot
 </ticker:1047164838566187039>: View the status of a company's shares
 </trending:1047856158792220753>: Get the trending stocks
 </portfolio add:1047164840789168138>: Add a ticker to you portfolio
@@ -664,7 +665,8 @@ async def support(interaction: discord.Interaction):
 @bot.slash_command(name = "help", description = "View the help page of the bot")
 async def help(interaction: discord.Interaction):
     help_embed = discord.Embed(title = "Information about the StockEmpire bot", description = "StockEmpire is a Discord Bot that supercharges your financial journey by bringing to you the latest and most useful financial data straight from Yahoo Finance - the most popular source of financial news, information, and data.", colour = discord.Colour.blue())
-    help_embed.add_field(name = "Commands:", value = '''</ticker:1047164838566187039>: View the status of a company's shares
+    help_embed.add_field(name = "Commands:", value = '''</help:1048240312683868272>: View the help page of the bot
+</ticker:1047164838566187039>: View the status of a company's shares
 </portfolio view:1047164840789168138>: View your portfolio
 </portfolio add:1047164840789168138>: Add a ticker to your portfolio
 </portfolio remove:1047164840789168138>: Remove a ticker from your portfolio
