@@ -1,9 +1,9 @@
 import nextcord as discord
 from nextcord.ext import commands
-import dotenv
 import os
 from stocks import stocks, getTrending, getWinners, getLosers, getCrypto
 from records import add_ticker, remove_ticker, get_portfolio, delete_portfolio, isCompany
+import dotenv
 
 dotenv.load_dotenv()
 
