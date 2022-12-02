@@ -19,7 +19,7 @@ Support Server: https://dsc.gg/stockempire-support
 ## ⚖ License
 This project is licensed under the [GNU General Public License v3.0](https://github.com/vsmart-06/StockEmpire/blob/master/LICENSE.md).
 
-    StockEmpire - A Discord Bot that supercharges your financial journey by bringing to you the latest and most useful financial data straight from Yahoo Finance - the most popular source of financial news, information, and data.
+    StockEmpire - A Discord Bot to supercharge your financial journey
     Copyright (C) 2022 - Present  Srivishnu Vusirikala
 
     This program is free software: you can redistribute it and/or modify
