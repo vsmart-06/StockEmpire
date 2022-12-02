@@ -674,7 +674,7 @@ async def help(interaction: discord.Interaction):
 </todays losers:1047856160407035978> View today's losers
 </crypto:1047856156770574376> View the highest values cryptocurrency stocks
 ''')
-    help_embed.add_field(name = "The Nexus:", value = "[Invite Me](https://discord.com/oauth2/authorize?client_id=1045722628465377350&permissions=274878220352&scope=bot%20applications.commands) · [Support Server](https://discord.gg/2WSSCZ8Yye)")
+    help_embed.add_field(name = "The Nexus:", value = "[Invite Me](https://discord.com/oauth2/authorize?client_id=1045722628465377350&permissions=274878220352&scope=bot%20applications.commands) · [Support Server](https://discord.gg/2WSSCZ8Yye)", inline = False)
     await interaction.send(embed = help_embed)
 
 bot.run(token)

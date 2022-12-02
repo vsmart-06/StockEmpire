@@ -2,7 +2,7 @@
 
 StockEmpire is a Discord Bot that supercharges your financial journey by bringing to you the latest and most useful financial data straight from Yahoo Finance - the most popular source of financial news, information, and data.
 
-## Features
+## 📜 Features
 StockEmpire has the following features:
 - View any ticker
 - View different time duration graphs for any ticker
@@ -12,7 +12,7 @@ StockEmpire has the following features:
 - View day's losers
 - View trending cryptocurrency tickers
 
-## Links
+## 🔗 Links
 Bot invite: https://dsc.gg/stockempire
 Support Server: https://dsc.gg/stockempire-support
 
